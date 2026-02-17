@@ -492,7 +492,11 @@
     "developedBy": "Développé par",
     "privacyPolicy": "Politique de Confidentialité",
     "termsOfService": "Conditions d'Utilisation",
-    "available": "Disponible en ligne & sur campus"
+    "available": "Disponible en ligne & sur campus",
+    "social": {
+      "facebook": "https://www.facebook.com/profile.php?id=61573956185952",
+      "instagram": "https://www.instagram.com/academieaisha?igsh=aXJyMTZjZDBqMG90"
+    }
   },
   "admissions": {
     "hero": {

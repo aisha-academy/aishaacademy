@@ -508,7 +508,11 @@
     "developedBy": "Developed by",
     "privacyPolicy": "Privacy Policy",
     "termsOfService": "Terms of Service",
-    "available": "Available Online & On-Campus"
+    "available": "Available Online & On-Campus",
+    "social": {
+      "facebook": "https://www.facebook.com/profile.php?id=61573956185952",
+      "instagram": "https://www.instagram.com/academieaisha?igsh=aXJyMTZjZDBqMG90"
+    }
   },
   "admissions": {
     "hero": {

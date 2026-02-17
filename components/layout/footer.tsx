@@ -63,7 +63,9 @@ const Footer: React.FC<FooterProps> = ({ lang: propLang, dict }) => {
             </p>
             <div className="flex items-center gap-4">
               <a
-                href="#"
+                href={footerDict.social?.facebook || "#"}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="p-2.5 rounded-full bg-white/5 hover:bg-accent hover:text-white transition-all duration-300 border border-white/10 hover:border-accent"
                 aria-label="Facebook"
               >
@@ -82,7 +84,9 @@ const Footer: React.FC<FooterProps> = ({ lang: propLang, dict }) => {
                 </svg>
               </a>
               <a
-                href="#"
+                href={footerDict.social?.instagram || "#"}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="p-2.5 rounded-full bg-white/5 hover:bg-accent hover:text-white transition-all duration-300 border border-white/10 hover:border-accent"
                 aria-label="Instagram"
               >
