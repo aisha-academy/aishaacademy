@@ -71,7 +71,7 @@ export default function WhyUs({ dict }: { dict: any }) {
             <div className="relative aspect-video rounded-3xl overflow-hidden shadow-2xl shadow-primary/20 border-4 border-white bg-gray-100 z-10 transform transition-transform hover:scale-[1.01] duration-500">
               <iframe
                 className="w-full h-full"
-                src="https://www.youtube.com/embed/He-NKKRNQrk?si=VcZLl6UvIgClpLcI"
+                src={dict.videoUrl}
                 title="Aisha Academy - Providing Excellence in Quranic Education"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 referrerPolicy="strict-origin-when-cross-origin"
