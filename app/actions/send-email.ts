@@ -7,6 +7,67 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const adminEmail =
   process.env.NEXT_PUBLIC_ADMIN_EMAIL || "info@aisha-academy.com";
 
+function generateEmailHtml(
+  title: string,
+  details: { label: string; value: string }[],
+  footer?: string,
+) {
+  const rows = details
+    .map(
+      (detail) => `
+    <tr>
+      <td style="padding: 12px; border-bottom: 1px solid #edf2f7; color: #4a5568; font-weight: 600; width: 35%;">${detail.label}</td>
+      <td style="padding: 12px; border-bottom: 1px solid #edf2f7; color: #2d3748;">${detail.value || "N/A"}</td>
+    </tr>
+  `,
+    )
+    .join("");
+
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      </head>
+      <body style="background-color: #f7fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 40px 0;">
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+          <tr>
+            <td align="center">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0;">
+                <!-- Header -->
+                <tr>
+                  <td style="background-color: #7c2d12; padding: 30px; text-align: center;">
+                    <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Aisha Academy</h1>
+                  </td>
+                </tr>
+                <!-- Body -->
+                <tr>
+                  <td style="padding: 40px;">
+                    <h2 style="color: #1a202c; margin-top: 0; margin-bottom: 24px; border-bottom: 2px solid #7c2d12; padding-bottom: 10px; display: inline-block;">${title}</h2>
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse;">
+                      ${rows}
+                    </table>
+                  </td>
+                </tr>
+                <!-- Footer -->
+                <tr>
+                  <td style="background-color: #f8fafc; padding: 20px; text-align: center; color: #718096; font-size: 14px;">
+                    ${footer || "This is an automated notification from Aisha Academy Website."}
+                  </td>
+                </tr>
+              </table>
+              <div style="margin-top: 20px; text-align: center; color: #a0aec0; font-size: 12px;">
+                &copy; ${new Date().getFullYear()} Aisha Academy. All rights reserved.
+              </div>
+            </td>
+          </tr>
+        </table>
+      </body>
+    </html>
+  `;
+}
+
 export async function sendEnrollmentEmail(formData: FormData) {
   const studentName = formData.get("studentName") as string;
   const parentName = formData.get("parentName") as string;
@@ -64,23 +125,24 @@ export async function sendEnrollmentEmail(formData: FormData) {
       from: "Aisha Academy <admissions@aisha-academy.com>",
       to: adminEmail,
       subject: `New Enrollment Application: ${studentName}`,
-      html: `
-        <h2>New Enrollment Application</h2>
-        <p><strong>Student Name:</strong> ${studentName}</p>
-        <p><strong>Age:</strong> ${age}</p>
-        <p><strong>Gender:</strong> ${gender}</p>
-        <p><strong>Parent Name:</strong> ${parentName}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Phone:</strong> ${phone}</p>
-        <p><strong>City:</strong> ${city}</p>
-        <p><strong>Learning Mode:</strong> ${learningMode}</p>
-        <p><strong>Program:</strong> ${program}</p>
-        <p><strong>Preferred Days:</strong> ${preferredDays}</p>
-        <p><strong>Preferred Time:</strong> ${preferredTime}</p>
-        <p><strong>Message:</strong> ${message}</p>
-        <hr />
-        <p>This enrollment has been saved to the database.</p>
-      `,
+      html: generateEmailHtml(
+        "New Enrollment Application",
+        [
+          { label: "Student Name", value: studentName },
+          { label: "Age", value: age },
+          { label: "Gender", value: gender },
+          { label: "Parent Name", value: parentName },
+          { label: "Email", value: email },
+          { label: "Phone", value: phone },
+          { label: "City", value: city },
+          { label: "Learning Mode", value: learningMode },
+          { label: "Program", value: program },
+          { label: "Preferred Days", value: preferredDays },
+          { label: "Preferred Time", value: preferredTime },
+          { label: "Message", value: message },
+        ],
+        "This enrollment has been saved to the database.",
+      ),
     });
 
     if (error) {
@@ -136,16 +198,17 @@ export async function sendContactEmail(formData: FormData) {
       from: "Aisha Academy Contact <info@aisha-academy.com>",
       to: adminEmail,
       subject: `New Contact Inquiry: ${inquiry} from ${name}`,
-      html: `
-        <h2>New Contact Inquiry</h2>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Phone:</strong> ${phone}</p>
-        <p><strong>Inquiry Type:</strong> ${inquiry}</p>
-        <p><strong>Message:</strong> ${message}</p>
-        <hr />
-        <p>This inquiry has been saved to the database.</p>
-      `,
+      html: generateEmailHtml(
+        "New Contact Inquiry",
+        [
+          { label: "Name", value: name },
+          { label: "Email", value: email },
+          { label: "Phone", value: phone },
+          { label: "Inquiry Type", value: inquiry },
+          { label: "Message", value: message },
+        ],
+        "This inquiry has been saved to the database.",
+      ),
     });
 
     if (error) {
@@ -196,13 +259,11 @@ export async function subscribeNewsletter(formData: FormData) {
       from: "Aisha Academy Newsletter <info@aisha-academy.com>",
       to: adminEmail,
       subject: `New Newsletter Subscriber: ${email}`,
-      html: `
-        <h2>New Newsletter Subscription</h2>
-        <p>A new user has subscribed to the Aisha Academy newsletter.</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <hr />
-        <p>This email has been recorded in the database.</p>
-      `,
+      html: generateEmailHtml(
+        "New Newsletter Subscription",
+        [{ label: "Email", value: email }],
+        "A new user has subscribed to the Aisha Academy newsletter. This email has been recorded in the database.",
+      ),
     });
 
     if (error) {

@@ -7,6 +7,67 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const adminEmail =
   process.env.NEXT_PUBLIC_ADMIN_EMAIL || "info@aisha-academy.com";
 
+function generateEmailHtml(
+  title: string,
+  details: { label: string; value: string }[],
+  footer?: string,
+) {
+  const rows = details
+    .map(
+      (detail) => `
+    <tr>
+      <td style="padding: 12px; border-bottom: 1px solid #edf2f7; color: #4a5568; font-weight: 600; width: 35%;">${detail.label}</td>
+      <td style="padding: 12px; border-bottom: 1px solid #edf2f7; color: #2d3748;">${detail.value || "N/A"}</td>
+    </tr>
+  `,
+    )
+    .join("");
+
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      </head>
+      <body style="background-color: #f7fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 40px 0;">
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+          <tr>
+            <td align="center">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0;">
+                <!-- Header -->
+                <tr>
+                  <td style="background-color: #7c2d12; padding: 30px; text-align: center;">
+                    <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Aisha Academy</h1>
+                  </td>
+                </tr>
+                <!-- Body -->
+                <tr>
+                  <td style="padding: 40px;">
+                    <h2 style="color: #1a202c; margin-top: 0; margin-bottom: 24px; border-bottom: 2px solid #7c2d12; padding-bottom: 10px; display: inline-block;">${title}</h2>
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse;">
+                      ${rows}
+                    </table>
+                  </td>
+                </tr>
+                <!-- Footer -->
+                <tr>
+                  <td style="background-color: #f8fafc; padding: 20px; text-align: center; color: #718096; font-size: 14px;">
+                    ${footer || "This is an automated notification from Aisha Academy Website."}
+                  </td>
+                </tr>
+              </table>
+              <div style="margin-top: 20px; text-align: center; color: #a0aec0; font-size: 12px;">
+                &copy; ${new Date().getFullYear()} Aisha Academy. All rights reserved.
+              </div>
+            </td>
+          </tr>
+        </table>
+      </body>
+    </html>
+  `;
+}
+
 export async function sendEnrollmentEmail(formData: FormData) {
   const studentName = formData.get("studentName") as string;
   const age = formData.get("age") as string;
@@ -52,43 +113,27 @@ export async function sendEnrollmentEmail(formData: FormData) {
       to: [adminEmail],
       replyTo: email,
       subject: `New Enrollment Application: ${studentName}`,
-      html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; padding: 20px; border-radius: 10px;">
-          <h2 style="color: #2D3748; border-bottom: 2px solid #E2E8F0; padding-bottom: 10px;">New Enrollment Received</h2>
-          
-          <div style="margin-top: 20px;">
-            <h3 style="color: #4A5568;">Student Information</h3>
-            <p><strong>Name:</strong> ${studentName}</p>
-            <p><strong>Age:</strong> ${age}</p>
-            <p><strong>Gender:</strong> ${gender}</p>
-            <p><strong>Learning Mode:</strong> ${learningMode}</p>
-          </div>
-
-          <div style="margin-top: 20px;">
-            <h3 style="color: #4A5568;">Parent Details</h3>
-            <p><strong>Name:</strong> ${parentName}</p>
-            <p><strong>Email:</strong> ${email}</p>
-            <p><strong>Phone:</strong> ${phone}</p>
-            <p><strong>City:</strong> ${city}</p>
-          </div>
-
-          <div style="margin-top: 20px;">
-            <h3 style="color: #4A5568;">Course Preferences</h3>
-            <p><strong>Program:</strong> ${course}</p>
-            <p><strong>Preferred Days:</strong> ${preferredDays}</p>
-            <p><strong>Preferred Time:</strong> ${preferredTime}</p>
-          </div>
-
-          <div style="margin-top: 20px;">
-            <h3 style="color: #4A5568;">Message/Notes</h3>
-            <p>${message || "No additional notes provided."}</p>
-          </div>
-
-          <div style="margin-top: 30px; font-size: 12px; color: #718096; text-align: center;">
-            Sent from Aisha Academy Website
-          </div>
-        </div>
-      `,
+      html: generateEmailHtml(
+        "New Enrollment Received",
+        [
+          { label: "Student Name", value: studentName },
+          { label: "Age", value: age },
+          { label: "Gender", value: gender },
+          { label: "Learning Mode", value: learningMode },
+          { label: "Parent Name", value: parentName },
+          { label: "Email", value: email },
+          { label: "Phone", value: phone },
+          { label: "City", value: city },
+          { label: "Program", value: course },
+          { label: "Preferred Days", value: preferredDays },
+          { label: "Preferred Time", value: preferredTime },
+          {
+            label: "Message",
+            value: message || "No additional notes provided.",
+          },
+        ],
+        "Sent from Aisha Academy Website",
+      ),
     });
 
     if (error) {
@@ -135,27 +180,17 @@ export async function sendContactEmail(formData: FormData) {
       to: [adminEmail],
       replyTo: email,
       subject: `New Contact Inquiry: ${inquiry} from ${name}`,
-      html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; padding: 20px; border-radius: 10px;">
-          <h2 style="color: #2D3748; border-bottom: 2px solid #E2E8F0; padding-bottom: 10px;">New Contact Inquiry</h2>
-          
-          <div style="margin-top: 20px;">
-            <p><strong>Name:</strong> ${name}</p>
-            <p><strong>Email:</strong> ${email}</p>
-            <p><strong>Phone:</strong> ${phone}</p>
-            <p><strong>Inquiry Type:</strong> ${inquiry}</p>
-          </div>
-
-          <div style="margin-top: 20px;">
-            <h3 style="color: #4A5568;">Message</h3>
-            <p>${message}</p>
-          </div>
-
-          <div style="margin-top: 30px; font-size: 12px; color: #718096; text-align: center;">
-            Sent from Aisha Academy Website
-          </div>
-        </div>
-      `,
+      html: generateEmailHtml(
+        "New Contact Inquiry",
+        [
+          { label: "Name", value: name },
+          { label: "Email", value: email },
+          { label: "Phone", value: phone },
+          { label: "Inquiry Type", value: inquiry },
+          { label: "Message", value: message },
+        ],
+        "Sent from Aisha Academy Website",
+      ),
     });
 
     if (error) {
