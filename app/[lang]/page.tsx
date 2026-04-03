@@ -14,6 +14,7 @@ import Newsletter from "@/components/sections/newsletter";
 import PricingPlans from "@/components/sections/PricingPlans";
 import { getDictionary } from "@/lib/dictionary";
 import ContactForm from "@/components/sections/contact-form";
+import { createClient } from "@/utils/supabase/server";
 
 export default async function Page({
   params,
@@ -22,6 +23,15 @@ export default async function Page({
 }) {
   const { lang } = await params;
   const dict = await getDictionary(lang as any);
+  const supabase = await createClient();
+
+  // Fetch real counts for the counter
+  const [{ count: online }, { count: physical }] = await Promise.all([
+    supabase.from("online_enrollments").select("*", { count: "exact", head: true }),
+    supabase.from("physical_enrollments").select("*", { count: "exact", head: true }),
+  ]);
+
+  const totalStudents = (online || 0) + (physical || 0);
 
   return (
     <main
@@ -30,7 +40,16 @@ export default async function Page({
     >
       <Navbar lang={lang} dict={dict} />
       <HeroSection dict={dict.hero} />
-      <StatCounter dict={dict.stats} />
+      <StatCounter
+        dict={dict.stats}
+        counts={{
+          students: totalStudents,
+          teachers: 15,
+          classes: 120,
+          experience: 10,
+        }}
+      />
+
       <ProgramsOverview dict={dict.programs} />
       <WhyUs dict={dict.whyUs} />
       <ProcessFlow dict={dict.process} />
