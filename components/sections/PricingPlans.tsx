@@ -126,7 +126,7 @@ const PricingPlans = ({ dict }: { dict: any }) => {
 
               {/* Action */}
               <Link
-                href="/admissions"
+                href="/admissions#admission-form"
                 className={`
                   w-full py-4 rounded-xl font-bold text-center transition-all duration-300 shadow-md active:scale-95
                   ${
