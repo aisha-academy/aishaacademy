@@ -1,6 +1,6 @@
 import "@/app/globals.css";
 import { createClient } from "@/utils/supabase/server";
-import AdminSidebar from "./components/AdminSidebar";
+import AdminDashboardShell from "./components/AdminDashboardShell";
 import { Toaster } from "sonner";
 
 export const metadata = {
@@ -32,12 +32,9 @@ export default async function AdminLayout({
   return (
     <html lang="en">
       <body>
-        <div className="min-h-screen bg-gray-50 flex">
-          <AdminSidebar userEmail={user.email || ""} />
-          <main className="flex-1 ml-64 min-h-screen overflow-auto">
-            {children}
-          </main>
-        </div>
+        <AdminDashboardShell userEmail={user.email || ""}>
+          {children}
+        </AdminDashboardShell>
         <Toaster richColors position="top-right" />
       </body>
     </html>

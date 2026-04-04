@@ -76,7 +76,7 @@ export default function NewsletterClient({ data }: { data: any[] }) {
         </p>
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-50/80">
